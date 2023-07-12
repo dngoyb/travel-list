@@ -7,11 +7,17 @@ const initialItems = [
 ];
 
 export default function App() {
+	const [items, setItems] = useState(initialItems);
+
+	function handleAddItems(item) {
+		setItems((items) => [...items, item]);
+	}
+
 	return (
 		<div className='app'>
 			<Logo />
-			<Form />
-			<ParkingList />
+			<Form onAddItems={handleAddItems} />
+			<ParkingList items={items} />
 			<Stats />
 		</div>
 	);
@@ -20,18 +26,30 @@ export default function App() {
 function Logo() {
 	return <h1> 🏝️ Far Away 🧳 </h1>;
 }
-function Form() {
+function Form({ onAddItems }) {
 	const [description, setDescription] = useState('');
 	const [quantity, setQuantity] = useState(1);
 
 	function handleSubmit(e) {
 		e.preventDefault();
+		const newItem = {
+			description,
+			quantity,
+			packed: false,
+			id: Date.now(),
+		};
+		if (!description) return;
+		onAddItems(newItem);
+		setDescription('');
+		setQuantity(1);
 	}
 
 	return (
 		<form className='add-form' onSubmit={handleSubmit}>
 			<h3>What do you need for your trip?</h3>
-			<select value={quantity} onChange={(e) => setQuantity(e.target.value)}>
+			<select
+				value={quantity}
+				onChange={(e) => setQuantity(Number(e.target.value))}>
 				{Array.from({ length: 20 }, (_, i) => i + 1).map((num) => (
 					<option value={num} key={num}>
 						{num}
@@ -48,11 +66,11 @@ function Form() {
 		</form>
 	);
 }
-function ParkingList() {
+function ParkingList({ items }) {
 	return (
 		<div className='list'>
 			<ul>
-				{initialItems.map((item) => (
+				{items.map((item) => (
 					<Item key={item.id} item={item} />
 				))}
 			</ul>
