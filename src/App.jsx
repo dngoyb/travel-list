@@ -3,7 +3,7 @@ import { useState } from 'react';
 const initialItems = [
 	{ id: 1, description: 'Passports', quantity: 2, packed: false },
 	{ id: 2, description: 'Socks', quantity: 12, packed: false },
-	{ id: 3, description: 'Charger', quantity: 1, packed: true },
+	{ id: 3, description: 'Charger', quantity: 1, packed: false },
 ];
 
 export default function App() {
@@ -34,7 +34,7 @@ export default function App() {
 				onDeleteItem={handleDeleteItem}
 				onToggleItem={handleToggleItem}
 			/>
-			<Stats />
+			<Stats items={items} />
 		</div>
 	);
 }
@@ -100,8 +100,6 @@ function ParkingList({ items, onDeleteItem, onToggleItem }) {
 }
 
 function Item({ item, onDeleteItem, onToggleItem }) {
-	console.log(item);
-
 	return (
 		<li>
 			<input
@@ -117,10 +115,25 @@ function Item({ item, onDeleteItem, onToggleItem }) {
 		</li>
 	);
 }
-function Stats() {
+function Stats({ items }) {
+	if (!items.length)
+		return (
+			<p className='stats'>
+				<em>Start adding some items to your parking list</em>
+			</p>
+		);
+	const numItems = items.length;
+	const numPacked = items.filter((item) => item.packed).length;
+	const percentage = Math.round((numPacked / numItems) * 100);
+
 	return (
 		<footer className='stats'>
-			<em>💼 You have X items on your list, and you already packed x (x%)</em>
+			<em>
+				{percentage === 100
+					? 'You got everything, Ready to go!'
+					: `💼 You have ${numItems} items on your list, and you already packed
+				${numPacked} (${percentage}%)`}
+			</em>
 		</footer>
 	);
 }
